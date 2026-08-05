@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 
 from gavaza.assess import Assessment, grade_for, run_interactive
-from gavaza.config import Company
 from gavaza.conditions import ALL_ITEM_IDS, CONDITION_MAP
+from gavaza.config import Company
 
 
 @pytest.fixture

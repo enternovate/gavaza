@@ -6,8 +6,8 @@ import pytest
 
 from gavaza.conditions import (
     ALL_ITEM_IDS,
-    CONDITIONS,
     CONDITION_MAP,
+    CONDITIONS,
     get_condition,
     item_lookup,
 )

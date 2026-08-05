@@ -8,10 +8,11 @@ computes per-condition scores (0-100), an overall score and an A-F grade.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
-from datetime import date
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from gavaza import __version__
 from gavaza.conditions import CONDITION_MAP, ChecklistItem, item_lookup
@@ -46,7 +47,7 @@ class Answer:
     note: str = ""
 
     @classmethod
-    def from_raw(cls, raw: Any) -> "Answer":
+    def from_raw(cls, raw: Any) -> Answer:
         """Coerce a raw value (string or dict) into an Answer."""
         if isinstance(raw, dict):
             value = str(raw.get("value", "no")).lower()
@@ -178,14 +179,14 @@ class Assessment:
         return {
             "version": __version__,
             "company": self.company.name,
-            "date": date.today().isoformat(),
+            "date": datetime.now(UTC).date().isoformat(),
             "overall_score": self.overall_score(),
             "grade": self.grade(),
             "conditions": conditions,
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any], company: Company | None = None) -> "Assessment":
+    def from_dict(cls, data: dict[str, Any], company: Company | None = None) -> Assessment:
         """Rebuild an Assessment from a saved results dictionary."""
         source = company or Company(name=str(data.get("company", "")))
         assessment = cls(source)

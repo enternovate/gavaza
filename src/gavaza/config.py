@@ -34,7 +34,7 @@ class Company:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Company":
+    def from_dict(cls, data: dict[str, Any]) -> Company:
         """Build a Company from a dictionary, tolerating unknown keys."""
         known = {f.name for f in cls.__dataclass_fields__.values()}  # type: ignore[attr-defined]
         return cls(**{key: value for key, value in data.items() if key in known})

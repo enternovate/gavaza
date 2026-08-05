@@ -5,8 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from gavaza import __version__
 from gavaza.assess import (
@@ -230,7 +230,7 @@ def _cmd_breach(args: argparse.Namespace) -> int:
         )
         path = add_breach(record)
         print(f"Breach logged in {path}")
-        print("")
+        print()
         print("72-hour notification checklist (POPIA section 22):")
         for index, step in enumerate(notification_checklist(), 1):
             print(f"  {index}. {step}")

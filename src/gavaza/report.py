@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import html
 import json
-from datetime import date
+from datetime import UTC, datetime
 from pathlib import Path
 
 from gavaza.assess import Assessment
@@ -32,8 +32,10 @@ def _remediation_section(assessment: Assessment) -> str:
     if not items:
         return "_No remediation items — every checklist item is answered yes._"
     lines = [
-        "Prioritised by condition score (worst first). Address items answered "
-        "**no** before **partial** within each condition.",
+        (
+            "Prioritised by condition score (worst first). Address items answered "
+            "**no** before **partial** within each condition."
+        ),
         "",
     ]
     for item in items:
@@ -55,7 +57,7 @@ def render_markdown(assessment: Assessment) -> str:
         "# POPIA Compliance Assessment Report",
         "",
         f"- **Company:** {assessment.company.name}",
-        f"- **Date:** {date.today().isoformat()}",
+        f"- **Date:** {datetime.now(UTC).date().isoformat()}",
         f"- **Overall score:** {score:.1f}/100",
         f"- **Grade:** {assessment.grade()}",
         "",
@@ -112,7 +114,7 @@ th {{ background: #f0fdf4; }}
 <body>
 <h1>POPIA Compliance Assessment Report</h1>
 <p><strong>Company:</strong> {html.escape(assessment.company.name)}<br>
-<strong>Date:</strong> {date.today().isoformat()}<br>
+<strong>Date:</strong> {datetime.now(UTC).date().isoformat()}<br>
 <span class="score">Overall score: {score:.1f}/100 &mdash; Grade {assessment.grade()}</span></p>
 <h2>Condition scores</h2>
 <table>

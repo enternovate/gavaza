@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +30,7 @@ BREACH_FILENAME = "breach-register.csv"
 class BreachRecord:
     """A single entry in the breach register."""
 
-    date: str = field(default_factory=lambda: date.today().isoformat())
+    date: str = field(default_factory=lambda: datetime.now(UTC).date().isoformat())
     description: str = ""
     categories: str = ""
     affected_count: int | str = 0
@@ -49,7 +49,7 @@ class BreachRecord:
         ]
 
     @classmethod
-    def from_row(cls, row: list[str]) -> "BreachRecord":
+    def from_row(cls, row: list[str]) -> BreachRecord:
         """Build a record from a CSV row in header order."""
         padded = (row + [""] * len(BREACH_HEADER))[: len(BREACH_HEADER)]
         return cls(*padded)

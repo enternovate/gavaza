@@ -8,8 +8,9 @@ external template engine. The breach register is a CSV handled by
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from gavaza.config import Company
 
@@ -283,16 +284,22 @@ def generate_processing_register(
     lines = [
         f"# Record of Processing Activities — {company.name}",
         "",
-        "This register documents the processing activities of "
-        f"{company.name} in terms of the conditions for lawful processing "
-        "under POPIA. It is maintained by the Information Officer and "
-        "reviewed at least annually.",
+        (
+            "This register documents the processing activities of "
+            f"{company.name} in terms of the conditions for lawful processing "
+            "under POPIA. It is maintained by the Information Officer and "
+            "reviewed at least annually."
+        ),
         "",
-        f"_Company: {company.name} | Registration: {company.reg_no or '—'} | "
-        f"Information Officer: {company.info_officer or '—'}_",
+        (
+            f"_Company: {company.name} | Registration: {company.reg_no or '—'} | "
+            f"Information Officer: {company.info_officer or '—'}_"
+        ),
         "",
-        "| Activity | Purpose | Data subjects | Categories of personal information | "
-        "Retention | Lawful basis | Sharing |",
+        (
+            "| Activity | Purpose | Data subjects | Categories of personal information | "
+            "Retention | Lawful basis | Sharing |"
+        ),
         "|---|---|---|---|---|---|---|",
     ]
     for row in rows:
