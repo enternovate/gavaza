@@ -1,11 +1,28 @@
-# Gavaza
+# Gavaza — POPIA Compliance Toolkit
 
 **POPIA compliance toolkit for South African organisations.**
 
 Gavaza models the eight conditions for the lawful processing of personal
 information under the **Protection of Personal Information Act 4 of 2013
 (POPIA)**, runs a compliance assessment against them, and generates the
-documents a responsible party needs:
+documents a responsible party needs.
+
+![MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
+![CI](https://github.com/enternovate/gavaza/actions/workflows/ci.yml/badge.svg)
+
+Gavaza is a tool, **not legal advice**. Documents it generates are starting
+points that should be reviewed by a qualified professional before use.
+
+## What it is / why it exists
+
+POPIA is law — but the paperwork it demands is rarely the hard part. Gavaza
+turns the eight conditions into a scored, repeatable assessment and produces
+the documents a responsible party must keep ready: the PAIA manual, privacy
+policy, records of processing, and a breach register with the 72-hour
+notification checklist. Local-first, no account, no cloud.
+
+## Key features
 
 - **PAIA manual** (section 51 of the Promotion of Access to Information
   Act 2 of 2000) — purpose, company details, Information Officer, records
@@ -16,13 +33,8 @@ documents a responsible party needs:
   with purpose, data subjects, categories, retention, lawful basis and sharing.
 - **Breach register** (CSV) plus the **72-hour breach notification checklist**
   and timeline guide under section 22.
-
-Gavaza is a tool, **not legal advice**. Documents it generates are starting
-points that should be reviewed by a qualified professional before use.
-
 - Pure Python 3.11+ standard library — no runtime dependencies.
 - Local-first: all data lives in `~/.gavaza/` (override with `GAVAZA_HOME`).
-- MIT licensed. Part of the Enternovate constellation of open-source tools.
 
 ## The eight POPIA conditions
 
@@ -37,87 +49,33 @@ points that should be reviewed by a qualified professional before use.
 | 7 | Security Safeguards | s.19–22 | Apply reasonable technical and organisational measures; notify breaches within 72 hours. |
 | 8 | Data Subject Participation | s.23–25 | Let data subjects access their information and request correction or deletion. |
 
-Each condition carries a checklist of 4–6 questions with remediation hints —
-the questions drive the assessment questionnaire.
+Each condition carries a checklist of 4–6 questions with remediation hints.
 
-## Installation
+## Install
 
 ```bash
-pip install gavaza          # once published
-# or from a checkout:
-pip install -e .
+pip install .        # from a checkout
+# or directly from GitHub:
+pip install git+https://github.com/enternovate/gavaza.git
 ```
 
-Python 3.11 or newer. No external dependencies.
+Requires Python 3.11 or newer. No runtime dependencies.
 
 ## Quick start
 
 ```bash
-# 1. Create your company configuration
-gavaza init --name "Acme (Pty) Ltd" --reg "2020/123456/07" \
-  --email info@acme.co.za --info-officer "Jane Dlamini" --contact "+27 11 555 0100"
-
-# or from an existing JSON file
-gavaza init company.json
-
-# 2. Run the compliance assessment (all items, scripted answers)
-gavaza assess --answers answers.json
-# ...or interactively
-gavaza assess --interactive
-
-# 3. Generate the documents
-gavaza generate --docs all
-
-# 4. Produce a report
-gavaza report --format md --out report.md
-gavaza report --format html --out report.html
-gavaza report --format json --out report.json
+gavaza init                          # create the compliance workspace
+gavaza assess                        # run the 8-condition questionnaire
+gavaza report                        # scored assessment with remediation
+gavaza generate paia                 # PAIA manual (s51)
+gavaza generate privacy              # privacy policy / POPIA notice
+gavaza generate register             # record of processing activities
+gavaza generate all                  # every document
+gavaza breach add --description "..."  # log a breach, get the 72h checklist
+gavaza conditions                    # list the eight conditions
 ```
 
-Scripted answers are a JSON object mapping checklist item ids to
-`"yes"`, `"no"` or `"partial"` (or to `{"value": ..., "note": ...}`):
-
-```json
-{
-  "acc-1": "yes",
-  "acc-2": {"value": "partial", "note": "policy drafted, not yet approved"},
-  "pl-1": "no"
-}
-```
-
-Run `gavaza conditions` to list every condition and checklist item id.
-
-## CLI reference
-
-```
-gavaza --version
-gavaza conditions                                  list the 8 conditions + checklists
-gavaza init [company.json] [--name .. --reg .. --email .. --address .. --info-officer .. --contact ..]
-gavaza assess [--interactive] [--answers FILE] [--out FILE]
-gavaza report [--format json|md|html] [--out FILE] [--results FILE]
-gavaza generate [--docs paia|privacy|register|all] [--out DIR]
-gavaza breach add --description .. [--date .. --categories .. --affected N --risk .. --status ..]
-gavaza breach list
-gavaza breach timeline
-```
-
-## Data and outputs
-
-Everything is stored under the Gavaza data directory — `~/.gavaza/` by
-default, or the path in the `GAVAZA_HOME` environment variable:
-
-```
-~/.gavaza/
-├── company.json                          # company configuration
-├── assessment.json                       # latest assessment results + scores
-├── breach-register.csv                   # breach register (CSV)
-└── docs/                                 # generated documents (default --out)
-    ├── PAIA-manual.md
-    ├── privacy-policy.md
-    └── record-of-processing-activities.md
-```
-
-### Scoring
+## Scoring
 
 - Each answer scores: `yes` = 100, `partial` = 50, `no`/unanswered = 0.
 - A condition's score is the mean of its checklist item scores (0–100).
@@ -126,25 +84,76 @@ default, or the path in the `GAVAZA_HOME` environment variable:
 - Reports include a prioritised remediation list (worst-scoring conditions
   first, with actionable hints).
 
+## CLI reference
+
+| Command | Description |
+|---|---|
+| `gavaza init` | Create the compliance workspace |
+| `gavaza assess [--answers FILE]` | Run the assessment questionnaire |
+| `gavaza report [--format json\|md\|html]` | Render the scored report |
+| `gavaza generate <paia\|privacy\|register\|all> [--out DIR]` | Generate compliance documents |
+| `gavaza breach add --description ... [--date] [--risk] [--status]` | Log a breach + 72-hour checklist |
+| `gavaza breach list` | List logged breaches |
+| `gavaza breach timeline` | Print the notification timeline guide |
+| `gavaza conditions` | List the eight conditions and checklists |
+
+## How it pairs with Xavani
+
+Ask Xavani Agent to "assess our POPIA readiness" and it loads the
+`gavaza-compliance` skill (from `xavani-constellation-skills`), drives the
+CLI, and explains the score. The `constellation-mcp` bundle exposes
+`gavaza_assess`, `gavaza_generate`, `gavaza_breach_add`, `gavaza_breach_list`,
+`gavaza_report` and `gavaza_conditions` as native tools. Pair the technical
+evidence from Mhangani audits with Gavaza's security-safeguards condition to
+prove compliance, not assert it.
+
+## Configuration
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `GAVAZA_HOME` | `~/.gavaza/` | Data directory for the compliance workspace |
+
 ## Development
 
 ```bash
-python -m venv .venv && . .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest tests/ -q
+python -m pytest tests/ -q
 ruff check src tests
 ```
 
-CI runs pytest on Python 3.11 and 3.12 plus ruff (see
+Structure: `src/gavaza/conditions.py` (the eight conditions + checklists),
+`assess.py` (scoring), `generate.py` (document rendering), `breach.py`
+(register + 72-hour timeline), `report.py` (output), `cli.py` (command
+surface).
+
+## Testing
+
+```bash
+python -m pytest tests/ -q      # 63 tests, 0 fail / 0 skip expected
+```
+
+CI runs pytest on Python 3.11, 3.12 and 3.13 plus ruff (see
 `.github/workflows/ci.yml`).
 
-## Licence
+## Security & privacy
+
+Zero telemetry. All data lives in `~/.gavaza/` on your machine. Gavaza never
+sends documents, answers or breach records anywhere.
+
+## License
 
 MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Enternovate (Pty) Ltd.
+Gavaza is not affiliated with, or endorsed by, the South African Information
+Regulator.
 
-## Constellation
+## Contributing
 
-Gavaza is part of the Enternovate constellation of open-source, local-first
-developer tools. See the [Enternovate organisation](https://github.com/enternovate)
-for sibling projects. Gavaza is not affiliated with, or endorsed by, the
-South African Information Regulator.
+Pull requests are welcome. Keep the zero-dependency rule: Gavaza's CLI must
+run on the standard library alone. Tests must stay green (0 fail / 0 skip).
+
+## The constellation
+
+[Xavani](https://github.com/enternovate/xavani-agent) · [Nyarhi](https://github.com/enternovate/nyarhi) · Gavaza · [Mhangani](https://github.com/enternovate/mhangani)
+
+Built by [Enternovate (Pty) Ltd](https://enternovate.co.za) — local-first, open, African-built.
