@@ -109,9 +109,12 @@ prove compliance, not assert it.
 
 ## Configuration
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `GAVAZA_HOME` | `~/.gavaza/` | Data directory for the compliance workspace |
+Copy `.env.example` to `.env` and adjust. Every variable is optional.
+Gavaza runs on defaults with no configuration.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `GAVAZA_HOME` | No | `~/.gavaza/` | Data directory for the compliance workspace |
 
 ## Development
 
