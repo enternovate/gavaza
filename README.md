@@ -133,7 +133,7 @@ surface).
 ## Testing
 
 ```bash
-python -m pytest tests/ -q      # 63 tests, 0 fail / 0 skip expected
+python -m pytest tests/ -q      # 38 tests, 0 fail / 0 skip expected
 ```
 
 CI runs pytest on Python 3.11, 3.12 and 3.13 plus ruff (see
