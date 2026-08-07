@@ -27,7 +27,7 @@ from gavaza.config import Company, docs_dir, load_config, save_config
 from gavaza.generate import write_docs
 from gavaza.report import latest_results_path, render, summary_lines
 
-DOC_CHOICES = ("paia", "privacy", "register")
+DOC_CHOICES = ("paia", "privacy", "register", "operator", "dsr-form", "consent", "retention", "pia")
 FORMAT_CHOICES = ("json", "md", "html")
 
 

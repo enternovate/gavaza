@@ -313,20 +313,53 @@ def generate_processing_register(
 
 
 def generate_document(company: Company, doc: str, activities: Iterable[dict[str, str]] | None = None) -> str:
-    """Generate one document by name: ``paia``, ``privacy`` or ``register``."""
+    """Generate one document by name.
+
+    Names: ``paia``, ``privacy``, ``register``, ``operator``,
+    ``dsr-form``, ``consent``, ``retention``, ``pia``.
+    """
     if doc == "paia":
         return generate_paia(company)
     if doc == "privacy":
         return generate_privacy_policy(company)
     if doc == "register":
         return generate_processing_register(company, activities)
-    raise ValueError(f"unknown document: {doc!r}; expected paia, privacy or register")
+    if doc == "operator":
+        from gavaza.documents import generate_operator_agreement
+
+        return generate_operator_agreement(company)
+    if doc == "dsr-form":
+        from gavaza.documents import generate_dsr_form
+
+        return generate_dsr_form(company)
+    if doc == "consent":
+        from gavaza.documents import generate_consent_template
+
+        return generate_consent_template(company)
+    if doc == "retention":
+        from gavaza.documents import generate_retention_schedule
+
+        return generate_retention_schedule(company)
+    if doc == "pia":
+        from gavaza.documents import generate_pia_questionnaire
+
+        return generate_pia_questionnaire(company)
+    raise ValueError(
+        "unknown document: "
+        f"{doc!r}; expected paia, privacy, register, operator, dsr-form, "
+        "consent, retention or pia"
+    )
 
 
 DOC_FILENAMES = {
     "paia": "PAIA-manual.md",
     "privacy": "privacy-policy.md",
     "register": "record-of-processing-activities.md",
+    "operator": "operator-agreement.md",
+    "dsr-form": "data-subject-request-form.md",
+    "consent": "consent-template.md",
+    "retention": "retention-schedule.md",
+    "pia": "privacy-impact-assessment.md",
 }
 
 
