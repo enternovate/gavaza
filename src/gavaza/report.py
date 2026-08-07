@@ -12,7 +12,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from gavaza.assess import Assessment
+from gavaza.assess import Assessment, maturity_label
 from gavaza.conditions import CONDITION_MAP
 
 
@@ -60,14 +60,19 @@ def render_markdown(assessment: Assessment) -> str:
         f"- **Date:** {datetime.now(UTC).date().isoformat()}",
         f"- **Overall score:** {score:.1f}/100",
         f"- **Grade:** {assessment.grade()}",
+        f"- **Maturity:** {maturity_label(assessment.overall_maturity())} "
+        f"(level {assessment.overall_maturity()} of 5)",
         "",
         "## Condition scores",
         "",
-        "| Condition | Score | Status |",
-        "|---|---|---|",
+        "| Condition | Score | Maturity | Status |",
+        "|---|---|---|---|",
     ]
     for name, slug, condition_score, status in _condition_rows(assessment):
-        lines.append(f"| {name} (`{slug}`) | {condition_score:.1f}/100 | {status} |")
+        lines.append(
+            f"| {name} (`{slug}`) | {condition_score:.1f}/100 | "
+            f"{assessment.condition_maturity(slug)} | {status} |"
+        )
     lines += ["", "## Prioritised remediation", "", _remediation_section(assessment), ""]
     return "\n".join(lines)
 
