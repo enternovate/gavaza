@@ -43,11 +43,13 @@ class Company:
 def data_dir() -> Path:
     """Return the Gavaza data directory, creating it if necessary.
 
-    ``GAVAZA_HOME`` overrides the default ``~/.gavaza``.
+    ``GAVAZA_HOME`` overrides the default ``~/.gavaza``. The directory
+    is created with mode 0700 so compliance data stays private.
     """
     override = os.environ.get("GAVAZA_HOME")
     base = Path(override).expanduser() if override else Path.home() / DEFAULT_HOME_NAME
     base.mkdir(parents=True, exist_ok=True)
+    os.chmod(base, 0o700)
     return base
 
 
