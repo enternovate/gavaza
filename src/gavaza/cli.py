@@ -126,6 +126,14 @@ def _parser() -> argparse.ArgumentParser:
         "--slug", help="print only the section with this slug"
     )
 
+    # gavaza gdpr-map
+    gdpr_map = sub.add_parser(
+        "gdpr-map", help="print the POPIA to GDPR mapping"
+    )
+    gdpr_map.add_argument(
+        "--format", choices=("md", "json"), default="md", help="output format (default: md)"
+    )
+
     return parser
 
 
@@ -313,6 +321,17 @@ def _cmd_conditions() -> int:
     return 0
 
 
+def _cmd_gdpr_map(args: argparse.Namespace) -> int:
+    """Print the POPIA to GDPR mapping."""
+    from gavaza.gdpr import render_json, render_markdown
+
+    content = render_json() if args.format == "json" else render_markdown()
+    sys.stdout.write(content)
+    if not content.endswith("\n"):
+        sys.stdout.write("\n")
+    return 0
+
+
 def _cmd_sections(args: argparse.Namespace) -> int:
     """List the additional POPIA compliance sections."""
     from gavaza.sections import SECTION_MAP
@@ -356,6 +375,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _cmd_conditions()
     if args.command == "sections":
         return _cmd_sections(args)
+    if args.command == "gdpr-map":
+        return _cmd_gdpr_map(args)
     parser.error(f"unknown command: {args.command}")
     return 2  # pragma: no cover
 
