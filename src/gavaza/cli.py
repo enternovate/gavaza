@@ -25,6 +25,7 @@ from gavaza.breach import (
 )
 from gavaza.config import Company, docs_dir, load_config, save_config
 from gavaza.generate import write_docs
+from gavaza.requests import REQUEST_RIGHTS, REQUEST_STATUSES
 from gavaza.report import latest_results_path, render, summary_lines
 
 DOC_CHOICES = ("paia", "privacy", "register", "operator", "dsr-form", "consent", "retention", "pia")
@@ -133,6 +134,27 @@ def _parser() -> argparse.ArgumentParser:
     gdpr_map.add_argument(
         "--format", choices=("md", "json"), default="md", help="output format (default: md)"
     )
+
+    # gavaza requests
+    requests = sub.add_parser("requests", help="manage data subject requests")
+    requests_sub = requests.add_subparsers(dest="requests_command", required=True)
+    req_new = requests_sub.add_parser("new", help="log a data subject request")
+    req_new.add_argument("--name", required=True, help="requester name")
+    req_new.add_argument("--email", required=True, help="requester email")
+    req_new.add_argument(
+        "--right",
+        required=True,
+        choices=list(REQUEST_RIGHTS),
+        help="right being exercised",
+    )
+    req_new.add_argument("--description", required=True, help="what the request asks for")
+    req_new.add_argument("--notes", default="", help="optional notes")
+    req_list = requests_sub.add_parser("list", help="list data subject requests")
+    req_list.add_argument("--status", choices=list(REQUEST_STATUSES), help="filter by status")
+    req_status = requests_sub.add_parser("status", help="update a request status")
+    req_status.add_argument("id", help="request id (e.g. req-1)")
+    req_status.add_argument("new_status", choices=list(REQUEST_STATUSES), help="new status")
+    requests_sub.add_parser("overdue", help="list requests past their deadline")
 
     return parser
 
@@ -321,6 +343,58 @@ def _cmd_conditions() -> int:
     return 0
 
 
+def _cmd_requests(args: argparse.Namespace) -> int:
+    """Manage data subject requests."""
+    from gavaza.requests import (
+        REQUEST_RIGHTS,
+        REQUEST_STATUSES,
+        list_requests,
+        new_request,
+        overdue_requests,
+        update_status,
+    )
+
+    if args.requests_command == "new":
+        request = new_request(
+            args.name, args.email, args.right, args.description, notes=args.notes
+        )
+        print(
+            f"{request.id} | {request.requester_name} | {request.right} | "
+            f"received {request.received_at} | deadline {request.deadline}"
+        )
+        return 0
+    if args.requests_command == "list":
+        entries = list_requests(status=args.status)
+        if not entries:
+            print("No data subject requests.")
+            return 0
+        for request in entries:
+            flag = " OVERDUE" if request.overdue else ""
+            print(
+                f"{request.id} | {request.requester_name} | {request.right} | "
+                f"{request.status} | deadline {request.deadline}{flag}"
+            )
+        return 0
+    if args.requests_command == "status":
+        if update_status(args.id, args.new_status):
+            print(f"{args.id} status set to {args.new_status}.")
+        else:
+            print(f"error: no request with id {args.id!r}", file=sys.stderr)
+            return 1
+        return 0
+    # overdue
+    overdue = overdue_requests()
+    if not overdue:
+        print("No overdue requests.")
+        return 0
+    for request in overdue:
+        print(
+            f"{request.id} | {request.requester_name} | {request.right} | "
+            f"deadline {request.deadline}"
+        )
+    return 0
+
+
 def _cmd_gdpr_map(args: argparse.Namespace) -> int:
     """Print the POPIA to GDPR mapping."""
     from gavaza.gdpr import render_json, render_markdown
@@ -377,6 +451,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _cmd_sections(args)
     if args.command == "gdpr-map":
         return _cmd_gdpr_map(args)
+    if args.command == "requests":
+        return _cmd_requests(args)
     parser.error(f"unknown command: {args.command}")
     return 2  # pragma: no cover
 
