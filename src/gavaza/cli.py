@@ -106,6 +106,18 @@ def _parser() -> argparse.ArgumentParser:
     # gavaza conditions
     sub.add_parser("conditions", help="list the eight POPIA conditions and their checklists")
 
+    # gavaza evidence
+    evidence = sub.add_parser("evidence", help="manage evidence for checklist items")
+    evidence_sub = evidence.add_subparsers(dest="evidence_command", required=True)
+    ev_add = evidence_sub.add_parser("add", help="attach a file to a checklist item")
+    ev_add.add_argument("item_id", help="checklist item id (e.g. acc-1)")
+    ev_add.add_argument("file", help="path of the evidence file")
+    ev_add.add_argument("--note", default="", help="optional note")
+    ev_list = evidence_sub.add_parser("list", help="list recorded evidence")
+    ev_list.add_argument("--item", help="filter by item id")
+    ev_remove = evidence_sub.add_parser("remove", help="remove an evidence entry")
+    ev_remove.add_argument("id", help="evidence entry id (e.g. ev-1)")
+
     # gavaza sections
     sections = sub.add_parser(
         "sections", help="list the additional POPIA compliance sections"
@@ -260,6 +272,35 @@ def _cmd_breach(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_evidence(args: argparse.Namespace) -> int:
+    """Manage evidence attached to checklist items."""
+    from gavaza.evidence import add_evidence, list_evidence, remove_evidence
+
+    if args.evidence_command == "add":
+        entry = add_evidence(args.item_id, args.file, note=args.note)
+        print(
+            f"Evidence added: {entry.id} -> {entry.item_id} ({entry.file}, "
+            f"sha256 {entry.sha256[:12]}...)"
+        )
+        return 0
+    if args.evidence_command == "list":
+        entries = list_evidence(item_id=args.item)
+        if not entries:
+            print("No evidence recorded.")
+            return 0
+        for entry in entries:
+            print(f"{entry.id} | {entry.item_id} | {entry.file} | {entry.date}"
+                  + (f" | {entry.note}" if entry.note else ""))
+        return 0
+    # remove
+    if remove_evidence(args.id):
+        print(f"Removed evidence {args.id}.")
+    else:
+        print(f"error: no evidence with id {args.id!r}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _cmd_conditions() -> int:
     from gavaza.conditions import CONDITIONS
 
@@ -309,6 +350,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _cmd_generate(args)
     if args.command == "breach":
         return _cmd_breach(args)
+    if args.command == "evidence":
+        return _cmd_evidence(args)
     if args.command == "conditions":
         return _cmd_conditions()
     if args.command == "sections":
