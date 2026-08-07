@@ -139,15 +139,49 @@ def render_json(assessment: Assessment) -> str:
     return json.dumps(assessment.to_dict(), indent=2, ensure_ascii=False)
 
 
+def render_csv(assessment: Assessment) -> str:
+    """Render the assessment as CSV: an overall row plus condition rows."""
+    import csv
+    import io
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["company", "date", "overall_score", "grade", "maturity"])
+    writer.writerow(
+        [
+            assessment.company.name,
+            datetime.now(UTC).date().isoformat(),
+            f"{assessment.overall_score():.1f}",
+            assessment.grade(),
+            f"{assessment.overall_maturity()} {maturity_label(assessment.overall_maturity())}",
+        ]
+    )
+    writer.writerow([])
+    writer.writerow(["condition_slug", "condition", "score", "maturity", "status"])
+    for name, slug, condition_score, status in _condition_rows(assessment):
+        writer.writerow(
+            [
+                slug,
+                name,
+                f"{condition_score:.1f}",
+                assessment.condition_maturity(slug),
+                status,
+            ]
+        )
+    return buffer.getvalue()
+
+
 def render(assessment: Assessment, fmt: str) -> str:
-    """Render the assessment in ``json``, ``md`` or ``html`` format."""
+    """Render the assessment in ``json``, ``md``, ``html`` or ``csv`` format."""
     if fmt == "json":
         return render_json(assessment)
     if fmt == "md":
         return render_markdown(assessment)
     if fmt == "html":
         return render_html(assessment)
-    raise ValueError(f"unknown report format {fmt!r}; expected json, md or html")
+    if fmt == "csv":
+        return render_csv(assessment)
+    raise ValueError(f"unknown report format {fmt!r}; expected json, md, html or csv")
 
 
 def summary_lines(assessment: Assessment) -> list[str]:

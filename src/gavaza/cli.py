@@ -29,7 +29,7 @@ from gavaza.requests import REQUEST_RIGHTS, REQUEST_STATUSES
 from gavaza.report import latest_results_path, render, summary_lines
 
 DOC_CHOICES = ("paia", "privacy", "register", "operator", "dsr-form", "consent", "retention", "pia")
-FORMAT_CHOICES = ("json", "md", "html")
+FORMAT_CHOICES = ("json", "md", "html", "csv")
 
 
 def _parser() -> argparse.ArgumentParser:
