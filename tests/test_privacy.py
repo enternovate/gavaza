@@ -30,7 +30,7 @@ def test_home_dir_is_0700(gavaza_home) -> None:
 
 def test_offline_cli_commands_never_touch_network(gavaza_home, capsys, monkeypatch) -> None:
     """Reference commands must succeed with the network blocked."""
-    def blocked(*args, **kwargs):  # noqa: ARG001 - deliberate blocker
+    def blocked(*args, **kwargs):
         raise AssertionError("network access attempted")
 
     monkeypatch.setattr(socket, "socket", blocked)

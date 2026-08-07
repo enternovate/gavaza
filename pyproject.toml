@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gavaza"
-version = "0.1.0"
+version = "0.2.0"
 description = "Gavaza — POPIA compliance toolkit. Model the eight conditions, assess compliance, and generate PAIA manuals, privacy policies and registers."
 readme = "README.md"
 requires-python = ">=3.11"

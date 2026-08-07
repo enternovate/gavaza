@@ -11,4 +11,4 @@ MIT licence and carries no warranty; consult a qualified professional for
 opinions about your specific compliance position.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
