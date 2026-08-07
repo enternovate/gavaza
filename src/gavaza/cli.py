@@ -346,8 +346,6 @@ def _cmd_conditions() -> int:
 def _cmd_requests(args: argparse.Namespace) -> int:
     """Manage data subject requests."""
     from gavaza.requests import (
-        REQUEST_RIGHTS,
-        REQUEST_STATUSES,
         list_requests,
         new_request,
         overdue_requests,
