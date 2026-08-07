@@ -106,6 +106,14 @@ def _parser() -> argparse.ArgumentParser:
     # gavaza conditions
     sub.add_parser("conditions", help="list the eight POPIA conditions and their checklists")
 
+    # gavaza sections
+    sections = sub.add_parser(
+        "sections", help="list the additional POPIA compliance sections"
+    )
+    sections.add_argument(
+        "--slug", help="print only the section with this slug"
+    )
+
     return parser
 
 
@@ -264,6 +272,29 @@ def _cmd_conditions() -> int:
     return 0
 
 
+def _cmd_sections(args: argparse.Namespace) -> int:
+    """List the additional POPIA compliance sections."""
+    from gavaza.sections import SECTION_MAP
+
+    if args.slug:
+        section = SECTION_MAP[args.slug]
+        _print_section(section)
+        return 0
+    for section in SECTION_MAP.values():
+        _print_section(section)
+        print()
+    return 0
+
+
+def _print_section(section) -> None:
+    """Print one section with its items."""
+    print(f"{section.name} ({section.slug})  [{section.act_reference}]")
+    print(f"  {section.description}")
+    for item in section.items:
+        print(f"  - {item.id}: {item.requirement}")
+        print(f"      Guidance: {item.guidance}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Entry point: parse arguments, dispatch, and return the exit code."""
     parser = _parser()
@@ -280,6 +311,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _cmd_breach(args)
     if args.command == "conditions":
         return _cmd_conditions()
+    if args.command == "sections":
+        return _cmd_sections(args)
     parser.error(f"unknown command: {args.command}")
     return 2  # pragma: no cover
 
