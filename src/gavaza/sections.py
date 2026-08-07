@@ -342,8 +342,8 @@ SECTIONS: tuple[Section, ...] = (
             SectionItem(
                 id="dsr-2",
                 requirement=(
-                    "Correct or delete inaccurate personal information on "
-                    "request."
+                    "Process requests to correct or delete inaccurate "
+                    "personal information."
                 ),
                 guidance=(
                     "Section 24 requires correction or deletion of "

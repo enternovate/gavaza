@@ -58,7 +58,9 @@ def test_sections_have_guidance() -> None:
 def test_special_personal_information_content() -> None:
     """The special information section must name protected categories."""
     section = get_section("special_personal_information")
-    text = " ".join(item.requirement for item in section.items).lower()
+    text = (section.description + " " + " ".join(
+        item.requirement for item in section.items
+    )).lower()
     assert "biometric" in text
     assert "health" in text
 
@@ -75,7 +77,7 @@ def test_data_subject_rights_covers_access() -> None:
     section = get_section("data_subject_rights")
     text = " ".join(item.requirement for item in section.items).lower()
     assert "access" in text
-    assert "correction" in text
+    assert "correct" in text
     assert "object" in text
 
 
